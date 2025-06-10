@@ -14,7 +14,7 @@ export const getBook = (bookId, callback) => {
 };
 
 export const deleteBook = (bookId, callback) => {
-    const data = {bookId: bookId};
+    const data = {bookId: bookId.toString()};
     const url = `${config.apiUrl}/deleteBook`;
     postRequest_v2(url, data, callback);
 };

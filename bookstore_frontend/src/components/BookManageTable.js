@@ -211,17 +211,16 @@ export class BookSalesTable extends React.Component {
         })
     }
     handleDelete = (record) => {
-        console.log(record);
-        const callback =  (data) => {
-            if(data.status==0){
+        console.log("Deleting book:", record);
+        const callback = (data) => {
+            if(data.status === 0) {
                 message.success(data.msg);
-            }
-            else{
+                this.fetchBooks(); // Refresh the list immediately after successful deletion
+            } else {
                 message.error(data.msg);
             }
-         };
+        };
         deleteBook(record.bookId, callback);
-        setTimeout(() => this.fetchBooks(), 100);
     }
     render(){
         const columns = [

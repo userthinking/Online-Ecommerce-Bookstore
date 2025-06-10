@@ -2,6 +2,7 @@ package com.vincentni.bookstore_backend.serviceimpl;
 
 import com.vincentni.bookstore_backend.constant.Constant;
 import com.vincentni.bookstore_backend.dao.BookDao;
+import com.vincentni.bookstore_backend.dao.CartDao;
 import com.vincentni.bookstore_backend.dto.NewBookDTO;
 import com.vincentni.bookstore_backend.entity.Book;
 import com.vincentni.bookstore_backend.service.BookService;
@@ -12,6 +13,7 @@ import com.vincentni.bookstore_backend.utils.sessionutils.SessionUtil;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +23,9 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     private BookDao bookDao;
+
+    @Autowired
+    private CartDao cartDao;
 
     @Override
     public Book findBookById(Integer id){
@@ -70,14 +75,27 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public Msg deleteBook(Integer bookId) {
         JSONObject auth = SessionUtil.getAuth();
         if(auth != null && Objects.equals(auth.getString(Constant.USER_TYPE), "admin")){
-            bookDao.delete(bookId);
-            return MsgUtil.makeMsg(MsgUtil.SUCCESS,MsgUtil.SUCCESS_DELETEBOOK);
-        }
-        else{
-            return MsgUtil.makeMsg(MsgUtil.ERROR,MsgUtil.ERROR_DELETEBOOK);
+            try {
+                Book book = bookDao.findOne(bookId);
+                if (book != null) {
+                    // Delete any cart items referencing this book
+                    cartDao.deleteCartItemsByBookId(bookId);
+                    // Now delete the book
+                    bookDao.delete(bookId);
+                    return MsgUtil.makeMsg(MsgUtil.SUCCESS, MsgUtil.SUCCESS_DELETEBOOK);
+                } else {
+                    return MsgUtil.makeMsg(MsgUtil.ERROR, "Book not found");
+                }
+            } catch (Exception e) {
+                System.out.println("Error deleting book: " + e.getMessage());
+                return MsgUtil.makeMsg(MsgUtil.ERROR, "Cannot delete book as it is referenced by other records");
+            }
+        } else {
+            return MsgUtil.makeMsg(MsgUtil.ERROR, MsgUtil.ERROR_DELETEBOOK);
         }
     }
 }

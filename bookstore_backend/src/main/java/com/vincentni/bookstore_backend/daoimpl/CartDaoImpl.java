@@ -44,5 +44,12 @@ public class CartDaoImpl implements CartDao {
         cartItemRepository.deleteByUserId(userId);
     }
 
+    @Override
+    public void deleteCartItemsByBookId(Integer bookId) {
+        List<CartItem> cartItems = cartItemRepository.findByBookId(bookId);
+        for (CartItem item : cartItems) {
+            cartItemRepository.deleteById(item.getCartItemId());
+        }
+    }
 
 }

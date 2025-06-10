@@ -1,122 +1,145 @@
 import React from 'react';
-import {message , DatePicker} from 'antd';
+import { message, DatePicker, Table } from 'antd';
 import * as orderService from '../services/orderService';
 import { getUsers } from '../services/userService';
 
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 
-export class UserSalesTable extends React.Component{
-    constructor(props){
+export class UserSalesTable extends React.Component {
+    constructor(props) {
         super(props);
-        this.state={
-            orderList:[],
-            userList:[],
-            showUserList:[],
+        this.state = {
+            orderList: [],
+            userList: [],
+            showUserList: [],
+            loading: true
         };
     }
+
     componentDidMount() {
         let user = JSON.parse(localStorage.getItem('user'));
         if (user === null) {
-            message.error("请登录");
+            message.error("Please login");
         } else if (user.userType !== 'admin') {
-            message.error("你没有权限");
+            message.error("You don't have permission");
         } else {
             this.fetchOrder();
-            setTimeout(() => this.fetchUser(), 100);
         }
-    };
+    }
 
     fetchOrder = () => {
-        const callback =  (data) => {
-            let orderList=[];
-            for (let order of data){
-                let totalPrice=0;
-                for(let item of order.orderItemList){
-                    totalPrice+=item.price*item.bookNumber;
+        const callback = (data) => {
+            if (data) {
+                let orderList = [];
+                for (let order of data) {
+                    let totalPrice = 0;
+                    for (let item of order.orderItemList) {
+                        totalPrice += item.price * item.bookNumber;
+                    }
+                    orderList.push({
+                        orderDate: order.time.substring(0, 10),
+                        price: totalPrice,
+                        userId: order.userId,
+                        username: order.username
+                    });
                 }
-                orderList.push({
-                    orderDate:order.time.substring(0,10),
-                    price:totalPrice,
-                    userId:order.userId,
+                this.setState({
+                    orderList: orderList,
+                    loading: false
+                }, () => {
+                    this.fetchUser();
                 });
             }
-            this.setState({
-                orderList:orderList,
-            });
         };
         orderService.getOrder(callback);
     }
 
     fetchUser = () => {
         const callback = (data) => {
-            let userList=new Array(data.length);
-            for(let user of data){
-                userList[user.userId-1]={
-                    username:user.username,
-                    cost:0
-                };
+            if (data) {
+                let userList = new Array(data.length);
+                for (let user of data) {
+                    userList[user.userId - 1] = {
+                        username: user.username,
+                        cost: 0
+                    };
+                }
+                for (let order of this.state.orderList) {
+                    if (userList[order.userId - 1]) {
+                        userList[order.userId - 1].cost += order.price;
+                    }
+                }
+                let showUserList = userList.filter(user => user && user.cost > 0);
+                this.setState({
+                    userList: userList,
+                    showUserList: showUserList.sort((a, b) => b.cost - a.cost)
+                });
             }
-            for(let order of this.state.orderList){
-                userList[order.userId-1].cost+=order.price;
-            }
-            let showUserList=JSON.parse(JSON.stringify(userList));
-            this.setState({
-                userList: userList,
-                showUserList:showUserList.sort(function(a, b){return b.cost - a.cost}),
-            });
         };
         getUsers(callback);
     }
 
-    timeChange = (_, dateString) =>{
+    timeChange = (_, dateString) => {
+        if (!dateString || dateString.length !== 2) return;
+        
         const startTime = new Date(Date.parse(dateString[0]));
         const endTime = new Date(Date.parse(dateString[1]));
         let arr = [];
         for (let order of this.state.orderList) {
             let time = new Date(Date.parse(order.orderDate));
-            if((startTime===''|| time >= startTime) && (endTime==='' || time <= endTime)){
+            if ((startTime === '' || time >= startTime) && (endTime === '' || time <= endTime)) {
                 arr.push(order);
             }
         }
-        let newUserList=JSON.parse(JSON.stringify(this.state.userList));
-        for(let user of newUserList){
-            user.cost=0;
+        let newUserList = JSON.parse(JSON.stringify(this.state.userList));
+        for (let user of newUserList) {
+            if (user) user.cost = 0;
         }
-        for(let order of arr){
-            newUserList[order.userId-1].cost+=order.price;
+        for (let order of arr) {
+            if (newUserList[order.userId - 1]) {
+                newUserList[order.userId - 1].cost += order.price;
+            }
         }
+        let filteredList = newUserList.filter(user => user && user.cost > 0);
         this.setState({
-            showUserList:newUserList.sort(function(a, b){return b.cost - a.cost}),
+            showUserList: filteredList.sort((a, b) => b.cost - a.cost)
         });
     }
 
-    render(){
-        const rows = [];
-            this.state.showUserList.map((item,idx) => {
-                rows.push(
-                    <div>
-                        <br/>
-                        <div className="Cart-Items">
-                            <div className="about">
-                                <h1 className="title">{item.username}</h1>
-                            </div>
-                            <div className="prices">
-                                <div className="amount">Rank:{idx+1} Total Cost: ${(item.cost/100).toFixed(2)} </div>
-                            </div>
-                        </div>
-                        <br/>
-                    </div>
-                );
-            });
-        return(
+    render() {
+        const columns = [
+            {
+                title: 'Rank',
+                dataIndex: 'rank',
+                key: 'rank',
+                render: (_, __, index) => index + 1
+            },
+            {
+                title: 'Username',
+                dataIndex: 'username',
+                key: 'username'
+            },
+            {
+                title: 'Total Cost',
+                dataIndex: 'cost',
+                key: 'cost',
+                render: (cost) => `$${(cost / 100).toFixed(2)}`
+            }
+        ];
+
+        return (
             <div>
-                <br/>
-                <RangePicker onChange={this.timeChange}/>
-                <br/>
-                {rows}
-                <br/>
+                <br />
+                <RangePicker onChange={this.timeChange} />
+                <br />
+                <br />
+                <Table 
+                    columns={columns}
+                    dataSource={this.state.showUserList}
+                    loading={this.state.loading}
+                    rowKey="username"
+                />
             </div>
         );
-    };
-
+    }
 }

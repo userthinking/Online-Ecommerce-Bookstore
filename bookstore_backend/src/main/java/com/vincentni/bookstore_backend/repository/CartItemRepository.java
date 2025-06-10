@@ -10,4 +10,6 @@ public interface CartItemRepository extends JpaRepository<CartItem,Integer> {
     void deleteByUserId(Integer userId);
     @Query(value = "from CartItem where userId = :userId and book.bookId = :bookId")
     CartItem getCartItemByUserIdAndBookId(@Param("userId") Integer userId, @Param("bookId") Integer bookId);
+    @Query(value = "from CartItem where book.bookId = :bookId")
+    List<CartItem> findByBookId(@Param("bookId") Integer bookId);
 }
