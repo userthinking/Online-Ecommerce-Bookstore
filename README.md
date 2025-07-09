@@ -1,231 +1,149 @@
-# Notes App - MERN Stack
+# E-Bookstore (React + Spring Boot)
 
-A modern, full-stack notes application built with the MERN stack (MongoDB, Express.js, React, Node.js), featuring user authentication, real-time note management, and a beautiful UI.
+A full-stack online bookstore web application where users can browse, search, and purchase books, while admins can manage inventory and users. Built with React (frontend), Spring Boot (backend), and MySQL (database).
 
 ---
 
-## 🚀 Features
+## 🚀 Demo
 
-### Authentication
-- User registration & login  
-- JWT-based authentication  
-- Secure password hashing with bcrypt  
-- Protected routes and API endpoints  
+Screenshots:
 
-### Notes Management
-- Create, read, update, and delete notes (CRUD)  
-- Random background colors for visual appeal  
-- Real-time search functionality  
-- Responsive grid layout  
-- Smooth animations and transitions  
+- Login  ![Login](./assets/Login.png)
+- Register  ![Register](./assets/Register.png)
+- Home  ![Home](./assets/Home.png)
+- Search Book  ![Search](./assets/SearchBookList.png)
+- Book Detail  ![Detail](./assets/ProductDetail.png)
+- Cart  ![Cart](./assets/Cart.png)
+- Checkout  ![Checkout](./assets/Checkout.png)
+- Order Record  ![Order](./assets/OrderList.png)
+- User Manage  ![UserManage](./assets/UserManage.png)
+- Book Manage  ![BookManage](./assets/BookManage.png)
+- User Sales Rank  ![Usersales](./assets/UserSales.png)
+- Book Sales Rank  ![Booksales](./assets/BookSales.png)
 
-### User Experience
-- Modern, responsive design across devices  
-- Intuitive user interface  
-- Loading states and error handling  
-- Toast notifications for user feedback  
-- Persistent authentication state  
+---
+
+## ✨ Features
+
+### Customer
+- Register, Login, Logout
+- Browse and search books
+- View book details
+- Add to cart, update cart
+- Checkout and place orders
+- View order history
+
+### Admin
+- Manage users (ban/unban)
+- Manage books (add/edit/delete)
+- View user sales rank
+- View book sales rank
 
 ---
 
 ## 🛠️ Tech Stack
 
-**Backend:**
-- Node.js  
-- Express.js  
-- MongoDB (with Mongoose)  
-- JWT for auth  
-- bcrypt for hashing  
-- CORS  
-
-**Frontend:**
-- React  
-- Vite as build tool  
-- Tailwind CSS for styling  
-- Axios for HTTP requests  
-- React Router for navigation  
-- React Toastify for notifications  
+- **Frontend:** [React](https://reactjs.org/), [Ant Design](https://ant.design/)
+- **Backend:** [Spring Boot](https://spring.io/projects/spring-boot), Hibernate (JPA)
+- **Database:** [MySQL](https://www.mysql.com/)
+- **API:** Fetch API
 
 ---
 
 ## 📁 Project Structure
 
-notes-mernstack/
-├── client/ # Frontend React app
-│ ├── src/
-│ │ ├── components/ # React components
-│ │ ├── context/ # Context API providers
-│ │ ├── api/ # API helper functions
-│ │ ├── pages/ # Page-level components
-│ │ ├── App.jsx
-│ │ └── main.jsx
-│ └── package.json
-└── server/ # Backend Node.js app
-├── src/
-│ ├── controllers/ # Route handlers
-│ ├── models/ # MongoDB models
-│ ├── routes/ # Express routes
-│ ├── middlewares/ # Auth & error handling
-│ ├── utils/ # Utility functions
-│ ├── db/ # DB connection
-│ ├── app.js
-│ └── index.js
-└── package.json
-
-yaml
-Copy
-Edit
+```
+Online-Ecommerce-Bookstore-main/
+│
+├── bookstore_backend/      # Spring Boot backend
+│   ├── src/
+│   ├── pom.xml
+│   └── ...
+│
+├── bookstore_frontend/     # React frontend
+│   ├── src/
+│   ├── package.json
+│   └── ...
+│
+├── assets/                 # Screenshots for documentation
+├── bookstore.sql           # Database schema and seed data
+└── README.md
+```
 
 ---
 
-## 🚀 Getting Started
+## 🏁 Getting Started
 
-### Prerequisites
-- Node.js v16+  
-- MongoDB (Local or Atlas)  
-- npm or Yarn  
+### 1. Clone the repository
+```bash
+git clone <repo-url>
+cd Online-Ecommerce-Bookstore-main
+```
 
-### Installation & Setup
+### 2. Database Setup (MySQL)
+- Create a database named `bookstore` in MySQL.
+- Import the schema and seed data:
+  ```bash
+  mysql -u <username> -p bookstore < bookstore.sql
+  ```
+- Update your MySQL username and password in `bookstore_backend/src/main/resources/application.properties`:
+  ```properties
+  spring.datasource.username=YOUR_USERNAME
+  spring.datasource.password=YOUR_PASSWORD
+  ```
 
-1. **Clone the repo**  
-   ```bash
-   git clone https://github.com/userthinking/Online-Ecommerce-Bookstore.git
-   cd notes-mernstack
-Install backend dependencies
+### 3. Backend Setup (Spring Boot)
+- Go to the backend directory:
+  ```bash
+  cd bookstore_backend
+  ```
+- Build and run the backend:
+  ```bash
+  ./mvnw spring-boot:run
+  # or on Windows
+  mvnw.cmd spring-boot:run
+  ```
+- The backend will start on [http://localhost:8088](http://localhost:8088)
 
-bash
-Copy
-Edit
-cd server
-npm install
-Install frontend dependencies
+### 4. Frontend Setup (React)
+- Open a new terminal and go to the frontend directory:
+  ```bash
+  cd bookstore_frontend
+  npm install
+  npm start
+  ```
+- The frontend will start on [http://localhost:3000](http://localhost:3000)
 
-bash
-Copy
-Edit
-cd ../client
-npm install
-Environment Variables
-Create .env in server/:
+---
 
-env
-Copy
-Edit
-MONGODB_URI=mongodb://localhost:27017/notes_db
-JWT_SECRET=your_jwt_secret_key_here
-PORT=3001
-CLIENT_URL=http://localhost:5173
-Start development servers
-Backend
+## ⚙️ Environment Variables
 
-bash
-Copy
-Edit
-cd server
-npm run dev
-Frontend
+Backend (`application.properties`):
+- `spring.datasource.url=jdbc:mysql://localhost:3306/bookstore`
+- `spring.datasource.username=YOUR_USERNAME`
+- `spring.datasource.password=YOUR_PASSWORD`
+- `server.port=8088`
 
-bash
-Copy
-Edit
-cd ../client
-npm run dev
-Access the app
+Frontend: No custom environment variables required by default.
 
-Frontend: http://localhost:5173
+---
 
-Backend API: http://localhost:3001
+## 📚 API Endpoints (Sample)
 
-🔧 API Endpoints
-Authentication
+- `POST /api/login` - User login
+- `POST /api/register` - User registration
+- `GET /api/books` - List/search books
+- `GET /api/books/:id` - Book details
+- `POST /api/cart` - Add to cart
+- `POST /api/order` - Place order
+- ... (see backend code for full list)
 
-POST /api/users/signup – Register new user
+---
 
-POST /api/users/login – Login user
+## 🙌 Contributing
 
-GET /api/users – Get all users (admin only)
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
-GET /api/users/:id – Get a user by ID
+---
 
-Notes (Protected Routes)
-
-GET /api/notes – Fetch all notes
-
-POST /api/notes – Create a new note
-
-GET /api/notes/:id – Fetch a specific note
-
-PUT /api/notes/:id – Update a note
-
-DELETE /api/notes/:id – Delete a note
-
-🔐 Security Features
-JWT authentication
-
-bcrypt for secure password storage
-
-Protected routes and middleware
-
-Input validation and sanitization
-
-Centralized error handling
-
-🎨 UI / UX Highlights
-Fully responsive design (mobile, tablet, desktop)
-
-Smooth animations & transitions
-
-Loading indicators & error messages
-
-Toast notifications for user feedback
-
-Real-time search and random note colors
-
-📱 Responsive Design
-Works seamlessly on:
-
-Desktop
-
-Tablets
-
-Mobile phones
-
-🚀 Deployment
-Backend:
-
-Set env variables on hosting platform
-
-Deploy (Heroku, Railway, DigitalOcean...)
-
-Connect to MongoDB Atlas
-
-Frontend:
-
-Run npm run build
-
-Deploy (Vercel, Netlify, GitHub Pages…)
-
-Update API Base URL for production
-
-🤝 Contributing
-Fork the repo
-
-Create a feature branch (git checkout -b feature-name)
-
-Make changes and test
-
-Open a pull request
-
-📄 License
-This project is MIT licensed.
-
-🆘 Support
-If you encounter any issues or bugs:
-
-Check existing issues
-
-Open a new issue with full details
-
-Contact the maintainers directly
-
-Happy note-taking! 📝✨
+## 📄 License
